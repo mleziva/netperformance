@@ -5,7 +5,7 @@ VisualStudioVersion = 15.0.28307.539
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "netcore", "netcore\netcore.csproj", "{6154E29B-5B00-4597-B017-2438472437CD}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "angularsample", "angularsample\angularsample.csproj", "{CCE61EA0-A265-4BB7-BA39-33009B5019F9}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AngularPerformanceSamples", "angularsample\AngularPerformanceSamples.csproj", "{CCE61EA0-A265-4BB7-BA39-33009B5019F9}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
