@@ -5,6 +5,8 @@ VisualStudioVersion = 15.0.28307.539
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "netcore", "netcore\netcore.csproj", "{6154E29B-5B00-4597-B017-2438472437CD}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "angularsample", "angularsample\angularsample.csproj", "{CCE61EA0-A265-4BB7-BA39-33009B5019F9}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -15,6 +17,10 @@ Global
 		{6154E29B-5B00-4597-B017-2438472437CD}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{6154E29B-5B00-4597-B017-2438472437CD}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{6154E29B-5B00-4597-B017-2438472437CD}.Release|Any CPU.Build.0 = Release|Any CPU
+		{CCE61EA0-A265-4BB7-BA39-33009B5019F9}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{CCE61EA0-A265-4BB7-BA39-33009B5019F9}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{CCE61EA0-A265-4BB7-BA39-33009B5019F9}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{CCE61EA0-A265-4BB7-BA39-33009B5019F9}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
