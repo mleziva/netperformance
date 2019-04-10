@@ -4,17 +4,17 @@
   <div class="form-inline">
     <div class="form-group">
       <label for="rsize">Request Size (bytes 8kb max):</label>
-      <input type="number" class="form-control" id="rsize">
+      <input type="number" class="form-control" id="rsize" [(ngModel)]="dataRequest.size">
     </div>
     <div class="form-group">
       <label for="rnum">Number of requests:</label>
-      <input type="number" class="form-control" id="rnum">
+      <input type="number" class="form-control" id="rnum" [(ngModel)]="dataRequest.numOfRequests">
     </div>
     <div class="form-group">
       <label for="networklatency">Network profile (chrome):</label>
-      <input type="text" class="form-control" id="networklatency">
+      <input type="text" class="form-control" id="networklatency" [(ngModel)]="dataRequest.networkProfile">
     </div>
-    <button type="submit" class="btn btn-default" (click)="addRandomResultsIntoLocalStorage()">Send</button>
+    <button type="submit" class="btn btn-default" (click)="makeRequests(dataRequest)">Send</button>
   </div>
   <h2>Run History</h2>
   <button type="submit" class="btn btn-default">Clear run history</button>

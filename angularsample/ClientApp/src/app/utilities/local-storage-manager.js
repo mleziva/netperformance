@@ -8,11 +8,11 @@ var LocalStorageManager = /** @class */ (function () {
         var existing = localStorage.getItem(name);
         // If no existing data, create an array
         // Otherwise, convert the localStorage string to an array
-        var arrayContents = existing ? existing.split(',') : [];
+        var arrayContents = existing ? JSON.parse(existing) : [];
         // Add new data to localStorage Array
         arrayContents.push(JSON.stringify(value));
         // Save back to localStorage
-        localStorage.setItem(name, arrayContents.toString());
+        localStorage.setItem(name, JSON.stringify(arrayContents));
     };
     LocalStorageManager.getLocalStorageItem = function (name) {
         var obj = JSON.parse(localStorage.getItem(name));
@@ -20,7 +20,10 @@ var LocalStorageManager = /** @class */ (function () {
     };
     LocalStorageManager.getLocalStorageArray = function (name) {
         var arrayOfObjects = [];
-        var arrayOfStringItems = localStorage.getItem(name).split(',');
+        var arrayOfStringItems = JSON.parse(localStorage.getItem(name));
+        if (!arrayOfStringItems) {
+            return arrayOfObjects;
+        }
         for (var i = 0; i < arrayOfStringItems.length; i++) {
             var obj = JSON.parse(arrayOfStringItems[i]);
             arrayOfObjects.push(obj);

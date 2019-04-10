@@ -1,6 +1,10 @@
 import { Component, Inject } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { LocalStorageManager } from '../utilities/local-storage-manager';
+import { Stopwatch } from '../utilities/stopwatch';
+import { Observable } from 'rxjs/Observable';
+import { Subject } from 'rxjs/Rx';
+import 'rxjs/add/observable/forkJoin';
 
 @Component({
   selector: 'app-http-redis',
@@ -8,27 +12,65 @@ import { LocalStorageManager } from '../utilities/local-storage-manager';
 })
 export class HttpRedisComponent {
   public requests: IHttpRequestHistory[];
-  private storageName: string = "";
-  constructor() {
-    this.requests = [];
-    let cur = new HttpRequestHistory();
-    this.requests.push(cur);
-    LocalStorageManager.addToLocalStorageArray(this.storageName, new HttpRequestHistory());
+  public dataRequest: IHttpDataRequest;
+  private storageName: string = "htppData";
+  private requestNumArray: number[];
+  private httpClient: HttpClient;
+  private baseUrl: string;
+  constructor(http: HttpClient, @Inject('BASE_URL') baseUrl: string) {
+    this.httpClient = http;
+    this.baseUrl = baseUrl;
+    this.dataRequest = new HttpDataRequest();
+    this.requests = LocalStorageManager.getLocalStorageArray<IHttpRequestHistory>(this.storageName);
   }
-/* 
- constructor(http: HttpClient, @Inject('BASE_URL') baseUrl: string) {
-    http.get<IHttpRequestHistory[]>(baseUrl + 'api/SampleData/WeatherForecasts').subscribe(result => {
-      this.requests = result;
-    }, error => console.error(error));
+  public makeRequests(dataRequest: IHttpDataRequest) {
+    this.requestNumArray = this.createArrayOfRandomNumbers(dataRequest.size);
+    let requestHistory = new HttpRequestHistory(dataRequest.size, dataRequest.networkProfile);
+    let observables: Observable<IHttpRequestHistory[]>[] = [];
+    for (var i = 0; i < dataRequest.numOfRequests; i++) {
+      var subject = new Subject();
+      let stopwatch = new Stopwatch();
+      stopwatch.start();
+      const observable = this.sendHttpRequest(stopwatch, requestHistory);
+      subject.subscribe(v => function () {
+        stopwatch.stop();
+        requestHistory.addRequest(stopwatch.elapsed);
+      });
+      observables.push(observable);
+      observable.subscribe(subject);
+    }
+    Observable.forkJoin(observables).subscribe(() => {
+        this.requests.push(requestHistory);
+        LocalStorageManager.addToLocalStorageArray(this.storageName, requestHistory);
+    });
   }
-*/
-  public addRandomResultsIntoLocalStorage() {
-    let cur = new HttpRequestHistory();
-    this.requests.push(cur);
-    LocalStorageManager.addToLocalStorageArray(this.storageName, new HttpRequestHistory());
+  private sendHttpRequest(stopwatch: Stopwatch, requestHistory: HttpRequestHistory)  {
+    const options = {
+      headers: new HttpHeaders().append('numArray', this.requestNumArray.toString()),
+    }
+    return this.httpClient.get<IHttpRequestHistory[]>(this.baseUrl + 'api/HttpRedis/NonRedisCheck', options);
+  }
+  private createArrayOfRandomNumbers(size:number): number[] {
+    let arrayOfNumbers: number[] = Array.from({ length: size }, () => Math.floor(Math.random() * 10* size));
+    return arrayOfNumbers;
   }
 }
+//.subscribe(result => {
+//  var temp = result;
+//  stopwatch.stop();
+//  requestHistory.addRequest(stopwatch.elapsed);
+//}, error => console.error(error));
 
+export class HttpDataRequest implements IHttpDataRequest{
+  size: number;
+  numOfRequests: number;
+  networkProfile: string;
+}
+interface IHttpDataRequest {
+  size: number;
+  numOfRequests: number;
+  networkProfile: string;
+}
 class HttpRequestHistory implements IHttpRequestHistory {
   timeStamp: Date;
   maxResponse: number;
@@ -37,14 +79,22 @@ class HttpRequestHistory implements IHttpRequestHistory {
   requestSize: number;
   numRequests: number;
   networkProfile: string;
-  constructor() {
-    this.timeStamp = new Date()
-    this.maxResponse= Math.random() * 2
-    this.minResponse= Math.random() * 2
-    this.averageResponse = Math.random() * 2
-    this.requestSize = Math.random() * 2
-    this.numRequests = Math.floor(Math.random() * 50)
-    this.networkProfile = "none"
+  private sumOfResponseTime: number;
+  constructor(requestSize: number, networkProfile: string) {
+    this.timeStamp = new Date();
+    this.requestSize = requestSize;
+    this.networkProfile = networkProfile;
+    this.maxResponse = 0;
+    this.minResponse = 0;
+    this.numRequests = 0;
+    this.sumOfResponseTime = 0;
+  }
+  public addRequest(elapsedTime: number) {
+    this.numRequests++;
+    this.sumOfResponseTime += elapsedTime;
+    if (elapsedTime > this.maxResponse) this.maxResponse = elapsedTime;
+    if (elapsedTime < this.minResponse || this.minResponse === 0) this.minResponse = elapsedTime;
+    this.averageResponse = this.sumOfResponseTime / this.numRequests;
   }
 }
 interface IHttpRequestHistory {
@@ -55,4 +105,5 @@ interface IHttpRequestHistory {
   requestSize: number;
   numRequests: number;
   networkProfile: string;
+
 }
