@@ -9,7 +9,7 @@ namespace AngularPerformanceSamples.Controllers
     public class HttpRedisController : Controller
     {
         private const string headerName = "numArray";
-        [HttpGet("[action]")]
+        [HttpPost("[action]")]
         public IActionResult NonRedisCheck()
         {
             var headersNumArray = GetNumListFromHeader(headerName);

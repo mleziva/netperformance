@@ -5,7 +5,8 @@ import { Stopwatch } from '../utilities/stopwatch';
 import { Observable } from 'rxjs/Observable';
 import { Subject } from 'rxjs/Rx';
 import 'rxjs/add/observable/forkJoin';
-
+import 'rxjs/add/observable/from';
+import 'rxjs/add/observable/concat';
 @Component({
   selector: 'app-http-redis',
   templateUrl: './http-redis.component.html'
@@ -23,32 +24,44 @@ export class HttpRedisComponent {
     this.dataRequest = new HttpDataRequest();
     this.requests = LocalStorageManager.getLocalStorageArray<IHttpRequestHistory>(this.storageName);
   }
+  //this is still making multiple requests
+  //need to review rxjs
+  //https://blog.angularindepth.com/rxjs-understanding-the-publish-and-share-operators-16ea2f446635
+  //https://medium.com/@benlesh/hot-vs-cold-observables-f8094ed53339
   public makeRequests(dataRequest: IHttpDataRequest) {
     this.requestNumArray = this.createArrayOfRandomNumbers(dataRequest.size);
     let requestHistory = new HttpRequestHistory(dataRequest.size, dataRequest.networkProfile);
     let observables: Observable<IHttpRequestHistory[]>[] = [];
     for (var i = 0; i < dataRequest.numOfRequests; i++) {
-      var subject = new Subject();
-      let stopwatch = new Stopwatch();
-      stopwatch.start();
-      const observable = this.sendHttpRequest(stopwatch, requestHistory);
-      subject.subscribe(v => function () {
-        stopwatch.stop();
-        requestHistory.addRequest(stopwatch.elapsed);
-      });
+      const observable = this.sendHttpRequest();
       observables.push(observable);
-      observable.subscribe(subject);
     }
+    //make all HTTP requests at the same time
+    let stopwatch = new Stopwatch();
+    stopwatch.start();
     Observable.forkJoin(observables).subscribe(() => {
+      stopwatch.stop();
+      requestHistory.addRequest(stopwatch.elapsed);
         this.requests.push(requestHistory);
         LocalStorageManager.addToLocalStorageArray(this.storageName, requestHistory);
     });
+    //execute requests on after another
+    //let stopwatch1 = new Stopwatch();
+    //stopwatch1.start();
+    //Observable.from(observables)
+    //  .concat()
+    //  .subscribe(() => {
+    //    stopwatch1.stop();
+    //    requestHistory.addRequest(stopwatch1.elapsed);
+    //    this.requests.push(requestHistory);
+    //    LocalStorageManager.addToLocalStorageArray(this.storageName, requestHistory);
+    //  });
   }
-  private sendHttpRequest(stopwatch: Stopwatch, requestHistory: HttpRequestHistory)  {
+  private sendHttpRequest()  {
     const options = {
       headers: new HttpHeaders().append('numArray', this.requestNumArray.toString()),
     }
-    return this.httpClient.get<IHttpRequestHistory[]>(this.baseUrl + 'api/HttpRedis/NonRedisCheck', options);
+    return this.httpClient.post<IHttpRequestHistory[]>(this.baseUrl + 'api/HttpRedis/NonRedisCheck', this.requestNumArray.toString(), options);
   }
   private createArrayOfRandomNumbers(size:number): number[] {
     let arrayOfNumbers: number[] = Array.from({ length: size }, () => Math.floor(Math.random() * 10* size));
