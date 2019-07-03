@@ -231,3 +231,9 @@ _Pvt_Extensions
 
 # FAKE - F# Make
 .fake/
+
+#json in settings folder
+/Settings/*.json
+
+#powershell run scripts
+/PowerShell/Azure-CosmosDb-Run.ps1
