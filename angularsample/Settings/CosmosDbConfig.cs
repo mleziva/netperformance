@@ -3,14 +3,14 @@ using System.IO;
 
 namespace AngularPerformanceSamples.Settings
 {
-    public class CosmosDb
+    public class CosmosDbConfig : ICosmosDbConfig
     {
         private static IConfiguration configuration;
-        static CosmosDb()
+        static CosmosDbConfig()
         {
             var builder = new ConfigurationBuilder()
           .SetBasePath(Directory.GetCurrentDirectory())
-          .AddJsonFile("cosmosdb.json", optional: true, reloadOnChange: true);
+          .AddJsonFile("./Settings/cosmosdb.json", optional: true, reloadOnChange: true);
             configuration = builder.Build();
 
         }
