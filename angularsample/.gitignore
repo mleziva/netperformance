@@ -236,4 +236,4 @@ _Pvt_Extensions
 /Settings/*.json
 
 #powershell run scripts
-/PowerShell/Azure-CosmosDb-Run.ps1
+/PowerShell/*-Run.ps1
