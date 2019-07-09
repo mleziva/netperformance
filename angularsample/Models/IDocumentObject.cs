@@ -6,6 +6,7 @@ namespace AngularPerformanceSamples.Models
     {
         [JsonProperty(PropertyName = "id")]
         string Id { get; set; }
+        string DataId { get; set; }
         string Data { get; set; }
     }
 }

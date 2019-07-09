@@ -1,8 +1,11 @@
-﻿using AngularPerformanceSamples.Models;
+﻿using AngularPerformanceSamples.Extensions;
+using AngularPerformanceSamples.Models;
 using AngularPerformanceSamples.Settings;
 using Microsoft.Azure.Documents;
 using Microsoft.Azure.Documents.Client;
+using Microsoft.Azure.Documents.Linq;
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Net;
 using System.Threading.Tasks;
@@ -58,14 +61,19 @@ namespace AngularPerformanceSamples.Services
 
             var docObj = await client.ReadDocumentAsync<DocumentObject>(UriFactory.CreateDocumentUri(databaseId, collectionId, id));
             return docObj.Document;
-            //// Set some common query options.
-            //FeedOptions queryOptions = new FeedOptions { MaxItemCount = -1 };
 
-            //IQueryable<IDocumentObject> idQuery = client.CreateDocumentQuery<IDocumentObject>(
-            //    UriFactory.CreateDocumentCollectionUri(databaseId, collectionId), queryOptions)
-            //    .Where(f => f.Id == id);
-
-            //return idQuery.Single();
         }
+        public async Task<DocumentObject> QuerySingleOnDataId(string id)
+        {
+            // Set some common query options.
+            FeedOptions queryOptions = new FeedOptions { MaxItemCount = 10 };
+
+            IQueryable<DocumentObject> idQuery = client.CreateDocumentQuery<DocumentObject>(
+                UriFactory.CreateDocumentCollectionUri(databaseId, collectionId), queryOptions)
+                .Where(f => f.DataId == id);
+
+            return (await idQuery.ToListAsync()).FirstOrDefault();
+        }
+       
     }
 }
