@@ -31,7 +31,7 @@ namespace AngularPerformanceSamples.Services
         {
             if (string.IsNullOrEmpty(databaseId))
             {
-                throw new Exception("Must create a data base before you can create an exception");
+                throw new Exception("Must create a data base before you can create a collection");
             }
             this.collectionId = collectionId;
             await client.CreateDocumentCollectionIfNotExistsAsync(UriFactory.CreateDatabaseUri(databaseId), new DocumentCollection { Id = collectionId });
